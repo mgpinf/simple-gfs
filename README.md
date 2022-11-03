@@ -25,3 +25,11 @@ Simplified simulation of gfs implemented in golang
 * weighted probabilities for success and failure
 * p(success): 0.8
 * p(failure): 0.2
+
+### To run
+```
+git clone https://github.com/mgpinf/simple-gfs.git
+cd ./simple-gfs/src
+go build
+./simple-gfs
+```
