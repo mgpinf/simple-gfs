@@ -1,5 +1,7 @@
 package main
 
+// Initialises all components
+
 import (
 	"fmt"
 	"log"
