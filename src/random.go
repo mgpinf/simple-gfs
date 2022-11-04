@@ -8,6 +8,10 @@ import (
 	wr "github.com/mroth/weightedrand"
 )
 
+const (
+	randomStringLength int = 6
+)
+
 func randomize() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
@@ -28,12 +32,20 @@ func opHandler() {
 	cyan("Client %v ", c.id)
 	file := c.selectFile()
 	if op == 1 {
-		cyan("reading file %v", file)
+		cyan("reading file %v\n", file)
 		c.read(file)
-	} else {
-		cyan("appending to file %v", file)
-		randomString := generateRandomString(4)
-		c.append(file, randomString)
+		return
+	}
+	cyan("appending to file %v\n", file)
+	randomString := "\n" + generateRandomString(randomStringLength)
+	res := false
+	for !res {
+		res = c.append(file, randomString)
+		if res {
+			boldGreen("Success!\n")
+		} else {
+			boldRed("Failure! Attempting again\n")
+		}
 	}
 }
 

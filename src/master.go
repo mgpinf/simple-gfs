@@ -30,7 +30,7 @@ func (m *master) initMaster() {
 		for j := 0; j < serverCount; j++ {
 			m.chunkServers[i][j] = (i + j) % serverCount
 			// add chunks and their replicas to different servers
-			ss[j].chs = append(ss[j].chs, chunk{id: i, data: fmt.Sprintf("server%vchunk%v", j, i)})
+			ss[j].chs = append(ss[j].chs, chunk{id: i, data: fmt.Sprintf("file_%v", i)})
 		}
 	}
 }

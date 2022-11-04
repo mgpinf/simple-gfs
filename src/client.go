@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -27,9 +26,8 @@ func (c *client) queryServer(chunk int, servers []int) {
 	randomize()
 	i := rand.Intn(replicationFactor)
 	server := servers[i]
-	underlineWhite("\nFile contents:\n")
-	yellow(ss[server].chs[chunk].data)
-	fmt.Println()
+	underlineWhite("File %v contents:\n", chunk)
+	yellow("%v\n", ss[server].chs[chunk].data)
 }
 
 func (c *client) read(file int) {
@@ -44,16 +42,11 @@ func (c *client) selectFile() int {
 	return files[i]
 }
 
-func (c *client) append(file int, data string) {
+func (c *client) append(file int, data string) bool {
 	servers := c.queryMaster(file)
 	primary, secondary1, secondary2 := servers[0], servers[1], servers[2]
-	fmt.Println()
-	ss[primary].appendPrimary(primary, file, data)
+	ss[primary].appendPrimary(file, data)
+	// res := ss[primary].appendSecondariesSerial(secondary1, secondary2, file, data)
 	res := ss[primary].appendSecondaries(secondary1, secondary2, file, data)
-	for !res {
-		boldRed("Failure! Attempting again\n")
-		ss[primary].appendPrimary(primary, file, data)
-		res = ss[primary].appendSecondaries(secondary1, secondary2, file, data)
-	}
-	boldGreen("Success!\n")
+	return res
 }
