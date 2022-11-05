@@ -10,6 +10,7 @@ Simplified simulation of gfs implemented in golang
 * primary and secondaries
 * weak consistency
 * simulation of success and failure
+* mutual exclusion with help of locks
 
 ### Assumptions
 * filename same as chunk handler name and expressed as integer

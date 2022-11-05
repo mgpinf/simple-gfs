@@ -26,7 +26,9 @@ func (c *client) queryServer(chunk int, servers []int) {
 	randomize()
 	i := rand.Intn(replicationFactor)
 	server := servers[i]
+	defer ss[server].mu.Unlock()
 	underlineWhite("File %v contents:\n", chunk)
+	ss[server].mu.Lock()
 	yellow("%v\n", ss[server].chs[chunk].data)
 }
 
@@ -44,9 +46,8 @@ func (c *client) selectFile() int {
 
 func (c *client) append(file int, data string) bool {
 	servers := c.queryMaster(file)
-	primary, secondary1, secondary2 := servers[0], servers[1], servers[2]
+	primary, secondaries := servers[0], servers[1:]
 	ss[primary].appendPrimary(file, data)
-	// res := ss[primary].appendSecondariesSerial(secondary1, secondary2, file, data)
-	res := ss[primary].appendSecondaries(secondary1, secondary2, file, data)
+	res := ss[primary].appendSecondaries(secondaries, file, data)
 	return res
 }

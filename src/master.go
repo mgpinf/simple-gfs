@@ -89,7 +89,22 @@ func (m *master) generateSnapshot() {
 			for j := range m.chunkServers[keys[i]] {
 				snapshotContent += fmt.Sprintf("%v ", m.chunkServers[i][j])
 			}
-			snapshotContent += fmt.Sprintf("%v\n", ss[m.chunkServers[keys[i]][0]].chs[i].data)
+			snapshotContent += "\n"
+			cmd := exec.Command("touch", ".snapshot/files/"+fmt.Sprintf("%d", ss[m.chunkServers[keys[i]][0]].id))
+			err := cmd.Run()
+			if err != nil {
+				log.Fatal(err)
+			}
+			fileContent := fmt.Sprintf("%v\n", ss[m.chunkServers[keys[i]][0]].chs[i].data)
+			f1, err11 := os.Create(".snapshot/files/" + fmt.Sprintf("%v", ss[m.chunkServers[keys[i]][0]].chs[i].id))
+			if err11 != nil {
+				log.Fatal(err)
+			}
+			_, err12 := f1.WriteString(fileContent)
+			if err12 != nil {
+				log.Fatal(err12)
+			}
+			f1.Close()
 		}
 		f, err := os.Create(".snapshot/SNAPSHOT")
 		if err != nil {
@@ -106,7 +121,7 @@ func (m *master) generateSnapshot() {
 }
 
 func (m *master) createSnapshotDirectoryIfNotExists() {
-	cmd := exec.Command("mkdir", "-p", ".snapshot")
+	cmd := exec.Command("mkdir", "-p", ".snapshot/files")
 	err := cmd.Run()
 	if err != nil {
 		log.Fatal(err)
@@ -119,6 +134,9 @@ func (m *master) initAll() {
 	m.initClients()
 	m.createSnapshotDirectoryIfNotExists()
 	m.generateSnapshot()
-	m.serialExec()
-	// m.concurrentExec()
+	if serial {
+		m.serialExec()
+		return
+	}
+	m.concurrentExec()
 }
